@@ -2,7 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 
-define('ELEGANT_VERSION', '2.0.0');
+define('ELEGANT_VERSION', '1.0.0');
 
 class ElegantServiceProvider extends ServiceProvider {
 
@@ -18,7 +18,7 @@ class ElegantServiceProvider extends ServiceProvider {
 
 		// Because Laravel doesn't actually set a public path here we'll define out own. This may become
 		// a limitation and hopefully will change at a later date.
-		$this->app['path.public'] = realpath($this->app['path.base'].'/packages/iyoworks/elegant');
+		$this->app['path.public'] = realpath($this->app['path.base'].'/vendors/iyoworks/elegant');
 	}
 
 	/**
