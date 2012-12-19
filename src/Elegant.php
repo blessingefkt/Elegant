@@ -1,6 +1,5 @@
-<?php
-namespace IyoWorks\Elegant;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-abstract class Elegant extends Eloquent {
+<?php namespace IyoWorks\Elegant;
+use Illuminate\Database\Eloquent\Model;
+abstract class Elegant extends Model {
 
 }
