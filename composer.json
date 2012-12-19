@@ -21,12 +21,7 @@
     },
     "autoload": {
         "psr-0": {
-            "IyoWorks\\Elegant": "src/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-dev": "1.0-dev"
+            "Elegant": "src/"
         }
     },
     "minimum-stability": "dev"
