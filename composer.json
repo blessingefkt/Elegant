@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Elegant": "src/"
+            "IyoWorks\\Elegant": "src/"
         }
     },
     "minimum-stability": "dev"
