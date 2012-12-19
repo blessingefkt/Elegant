@@ -1,4 +1,4 @@
-<?php namespace IyoWorks\Elegant;
+<?php namespace Elegant;
 use Illuminate\Support\ServiceProvider;
 
 define('ELEGANT_VERSION', '1.0.0');
