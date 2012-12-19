@@ -24,5 +24,10 @@
             "IyoWorks\\Elegant": "src/"
         }
     },
+    "extra": {
+        "branch-alias": {
+            "dev-dev": "1.0-dev"
+        }
+    },
     "minimum-stability": "dev"
 }
