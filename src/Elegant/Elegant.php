@@ -233,7 +233,8 @@ abstract class Elegant extends Model {
 		return $instance->_isTrashed();
 	}
 	public static function all($excSoftDeletes= true){
-		if($this->softdelete and $excSoftDeletes)
+		$instance = new static;
+		if(!is_null($instance->softdelete) and $excSoftDeletes)
 			return static::deleted(0)->get();
 		return parent::all();
 	}
