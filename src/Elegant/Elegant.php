@@ -2,10 +2,14 @@
 use Illuminate\Database\Eloquent\Model;
 use Cache;
 abstract class Elegant extends Model {
+	  /**
+	   * Illuminate application instance.
+	   * @var Illuminate/Foundation/Application
+	   */
+	protected $app;
 	public $timestamps = true;
 	public $autoSetCreator = null;
 	public $softDelete;
-	public  $entityName;
 	public $rules = array();
 	private $ruleSubs = array();
 	public $messages = array();
@@ -17,22 +21,17 @@ abstract class Elegant extends Model {
 	public $ttl = 20; // Time To Live - for cache
 	protected $url = array();
 
-	public function __construct($attributes = array())
+	public function __construct($attributes = array(), $app = null)
 	{
 		 parent::__construct($attributes);
-		 if( ! is_null($this->getKey()) )
-		 	$this->exists = !static::dne($this->getKey());
+		 $this->app = $app;
+		 // if( ! is_null($this->getKey()) )
+		 // 	$this->exists = !static::dne($this->getKey());
 		  // initialize empty messages object
 		 $this->errors = new \Illuminate\Support\MessageBag();
 		 $this->modelName = get_class($this);
-		  if(!is_null($this->entityName))
-		 {
-		 	$entityName = $this->entityName;
-			$this->entity = new $entityName($this);
-		 }
-		 call_user_func ( [$this, '_initialize' ]);
+		 $this->generateEntity();
 	}
-	public function _initialize(){}
 	// /* Creator ****************************/
 	public function creator()
 	{
@@ -209,7 +208,7 @@ abstract class Elegant extends Model {
 			return $instance->newQuery()->where($colms, '=', $value)->first($columns);
 	}
 
-	public function _isTrashed(){
+	public function _isDeleted(){
 		if(!is_null($this->softDelete))
 			return $this->{$this->softDelete};
 		else
@@ -229,11 +228,11 @@ abstract class Elegant extends Model {
 			return false;
 		return true;
 	}
-	public static function isTrashed($id)
+	public static function isDeleted($id)
 	{
 		$instance = new static;
 		$instance = $instance->_find($id);
-		return $instance->_isTrashed();
+		return $instance->_isDeleted();
 	}
 	public static function all($excSoftDeletes= true){
 		$instance = new static;
@@ -245,6 +244,16 @@ abstract class Elegant extends Model {
 	public static function deleted($val =1){
 		$instance  = new static;
 		return $instance->_deleted($val);
+	}
+
+	private function generateEntity(){
+		$entity = $this->app['path.base'].'/'. ( $this->entity?: $this->app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
+		$fs = new Illuminate\Filesystem;
+		if (file_exists($entity))
+		{
+			$model = clone $this;
+			$this->entity = $fs->getRequire($entity);
+		}
 	}
 
 }
