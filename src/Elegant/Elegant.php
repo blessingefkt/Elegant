@@ -182,7 +182,7 @@ abstract class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public function static find($value, $colms = [], $columns = array('*'))
+	public static function find($value, $colms = [], $columns = array('*'))
 	{
 		$instance = new static;
 		if($this->useCache)
