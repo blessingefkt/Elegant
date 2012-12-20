@@ -182,28 +182,29 @@ abstract class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public function _find($value, $colms = null, $columns = array('*'))
+	public function static find($value, $colms = [], $columns = array('*'))
 	{
+		$instance = new static;
 		if($this->useCache)
 		{
-			$cache_key = $this->getCacheKey($value);
+			$cache_key = $instance->getCacheKey($value);
 			if (Cache::has($cache_key))
 				return Cache::get($cache_key);
 		}
-		if (is_null($colms))
-			$colms = $this->key;
+		if (empty($colms))
+			return $instance->newQuery()->find($value, $columns);
 		if (is_array($colms))
 		{
 			foreach ($colms as $r)
 			{
-				$result =$this->newQuery()->where($r, '=', $value)->first($columns);
+				$result =$instance->newQuery()->where($r, '=', $value)->first($columns);
 				if( $result )
 					return $result;
 			}
 			return null;
 		}
 		else
-			return $this->newQuery()->where($colms, '=', $value)->first($columns);
+			return $instance->newQuery()->where($colms, '=', $value)->first($columns);
 	}
 
 	public function _isTrashed(){
