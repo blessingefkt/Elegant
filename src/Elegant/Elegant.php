@@ -225,7 +225,10 @@ abstract class Elegant extends Model {
 
 	public static function deleted($val =1){
 		$model  = new static;
-		return static::where($model->softdelete, '=',$val);
+		if($model->softdelete)
+			return static::where($model->softdelete, '=',$val);
+		else
+			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified");
 	}
 
 }
