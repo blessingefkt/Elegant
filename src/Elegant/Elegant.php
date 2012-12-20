@@ -1,20 +1,20 @@
 <?php namespace Elegant;
 use Illuminate\Database\Eloquent\Model;
 abstract class Elegant extends Model {
-	public static $timestamps = true;
-	public static $autoSetCreator = 'creator_id';
-	public static $softDelete;
-	public static $entityName;
-	public static $rules = array();
+	public $timestamps = true;
+	public $autoSetCreator = 'creator_id';
+	public $softDelete;
+	public  $entityName;
+	public $rules = array();
 	private $ruleSubs = array();
-	public static $messages = array();
+	public $messages = array();
 	public $errors;
-	public static $modelname = null;
-	public static $urlbase = null;
-	public static $processorOpts= array();
-	public static $processors = [];
+	public $modelName = null;
+	public $urlbase = null;
+	public $processorOpts= array();
+	public $processors = [];
 	public $entity = null;
-	public static $useCache = true;
+	public $useCache = true;
 	public $ttl = 20; // Time To Live - for cache
 	protected $url = array();
 
@@ -22,14 +22,11 @@ abstract class Elegant extends Model {
 	{
 		 parent::__construct($attributes);
 		 $this->errors = new Laravel\Messages();    // initialize empty messages object
-		 static::$modelname = get_class($this);
-		  if(!is_null(static::$entityName))
+		 $this->modelName = get_class($this);
+		  if(!is_null($this->entityName))
 		 {
-		 	$entityName = static::$entityName;
+		 	$entityName = $this->entityName;
 			$this->entity = new $entityName($this);
-		 }
-		 foreach (static::$processorOpts as $attr => $actOpts) {
-		 	static::$processors[$attr] = $this->getAttrProcessorInfo($actOpts);
 		 }
 		 call_user_func ( [$this, '_initialize' ]);
 	}
@@ -110,7 +107,7 @@ abstract class Elegant extends Model {
 	// 		$before = is_null($preDelete) ? $this->preDelete() : $preDelete($this);
 	// 		$success = null;
 	// 		if($before) {
-	// 			$this->set_attribute(static::$softDelete, $val);
+	// 			$this->set_attribute($this->softdelete, $val);
 	// 			$success = $this->save(false);
 	// 		}
 	// 		else
@@ -124,7 +121,7 @@ abstract class Elegant extends Model {
 	// public function postDelete(){}
 	// public function delete($softDelete = true, $preDelete=null, $postDelete=null)
 	// {
-	// 	if (static::$softDelete and isset($this->original[static::$softDelete]))
+	// 	if ($this->softdelete and isset($this->original[$this->softdelete]))
 	// 		$success = $this->softDelete($softDelete, $preDelete, $postDelete);
 	// 	else
 	// 		$success = $this->hardDelete($preDelete, $postDelete);
@@ -284,13 +281,13 @@ abstract class Elegant extends Model {
 	// 	return $o->delete;
 	// }
 	// public static function all($includeDeleted = true){
-	// 	if(static::$softDelete and $includeDeleted)
+	// 	if($this->softdelete and $includeDeleted)
 	// 		return static::deleted(0)->get();
 	// 	return parent::all();
 	// }
 
 	// public static function deleted($val =1){
-	// 	$delete = "where_".static::$softDelete;
+	// 	$delete = "where_".$this->softdelete;
 	// 	return static::{$delete}($val);
 	// }
 
