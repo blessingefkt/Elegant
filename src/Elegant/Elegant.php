@@ -189,7 +189,7 @@ class Elegant extends Model {
 			if (Cache::has($cache_key))
 				return Cache::get($cache_key);
 		}
-		if (is_array($col))
+		if (is_array($columns))
 			return parent::find($value, $columns );
 		if(is_string($columns))
 			return static::where($columns, '=', $value)->first();
