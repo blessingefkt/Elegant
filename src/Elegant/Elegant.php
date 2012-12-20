@@ -161,9 +161,9 @@ class Elegant extends Model {
 
 	public function __get($key)
 	{
-		if($this->entity)
-			if($this->entity->hasAttribute($key))
-				return $this->entity->$key();
+		if($this->entity())
+			if($this->entity()->hasAttribute($key))
+				return $this->entity()->$key();
 		if($key =='entity')
 			return $this->entity();
 		return parent::__get($key);
