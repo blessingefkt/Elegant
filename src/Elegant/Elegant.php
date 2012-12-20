@@ -2,11 +2,6 @@
 use Illuminate\Database\Eloquent\Model;
 use Cache;
 class Elegant extends Model {
-	  /**
-	   * Illuminate application instance.
-	   * @var Illuminate/Foundation/Application
-	   */
-	public $app;
 	public $timestamps = true;
 	public $autoSetCreator = null;
 	public $softDelete;
@@ -16,7 +11,7 @@ class Elegant extends Model {
 	public $errors;
 	public $modelName = null;
 	public $urlbase = null;
-	public $entity = null;
+	public $entity;
 	public $useCache = true;
 	public $ttl = 20; // Time To Live - for cache
 	protected $url = array();
@@ -24,12 +19,10 @@ class Elegant extends Model {
 	public function __construct($attributes = array())
 	{
 		 parent::__construct($attributes);
-		 // if( ! is_null($this->getKey()) )
-		 // 	$this->exists = !static::dne($this->getKey());
 		  // initialize empty messages object
 		 $this->errors = new \Illuminate\Support\MessageBag();
 		 $this->modelName = get_class($this);
-		 $this->generateEntity();
+
 	}
 	// /* Creator ****************************/
 	public function creator()
@@ -168,11 +161,11 @@ class Elegant extends Model {
 
 	public function __get($key)
 	{
-		if(!is_null($this->entity))
-		{
-			if(array_key_exists($this->entity, $key))
-				return $this->entityValue($key);
-		}
+		if($this->entity)
+			if($this->entity->hasAttribute($key))
+				return $this->entity->$key();
+		if($key =='entity')
+			return $this->entity();
 		return parent::__get($key);
 	}
 	private function getCacheKey($id)
@@ -180,23 +173,12 @@ class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	private function generateEntity(){
-		if(is_null($this->app))
-			$this->app = app();
-		$entity = $this->app['path.base'].'/'. ( $this->entity?: $this->app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
-		$fs = new \Illuminate\Filesystem;
-		if (file_exists($entity))
-		{
-			$model = clone $this;
-			$this->entity = $fs->getRequire($entity);
+	public function entity(){
+		if(is_string($this->entity)){
+			$name = $this->entity;
+			$this->entity = new $name($this);
 		}
-	}
-
-	public function entityValue($key){
-		if(is_null($this->app))
-			$this->app = app();
-		$value = $this->entity[$key];
-		return $value instanceof Closure ? $value($this->app) : $value;
+		return $this->entity;
 	}
 	public function _isDeleted(){
 		if(!is_null($this->softDelete))
@@ -253,8 +235,3 @@ class Elegant extends Model {
 	}
 
 }
-// public  static function retrieve($key, $val)
-// 	{
-// 		$instance = new static;
-// 		return $instance->newQuery()->where($key, '=', $val)->first();
-// 	}
