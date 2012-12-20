@@ -185,7 +185,7 @@ abstract class Elegant extends Model {
 	public static function find($value, $colms = [], $columns = array('*'))
 	{
 		$instance = new static;
-		if($this->useCache)
+		if($instance->useCache)
 		{
 			$cache_key = $instance->getCacheKey($value);
 			if (Cache::has($cache_key))
