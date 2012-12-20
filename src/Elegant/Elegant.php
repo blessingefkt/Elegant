@@ -193,18 +193,15 @@ class Elegant extends Model {
 		}
 		if (empty($colms))
 			return $instance->newQuery()->find($value, $columns);
-		if (is_array($colms))
-		{
-			foreach ($colms as $r)
-			{
-				$result =$instance->newQuery()->where($r, '=', $value)->first($columns);
-				if( $result )
-					return $result;
-			}
-			return null;
-		}
-		else
+		if(is_string($colms))
 			return $instance->newQuery()->where($colms, '=', $value)->first($columns);
+		foreach ($colms as $r)
+		{
+			$result =$instance->newQuery()->where($r, '=', $value)->first($columns);
+			if( $result )
+				return $result;
+		}
+		return null;
 	}
 
 	public function _isDeleted(){
@@ -246,6 +243,8 @@ class Elegant extends Model {
 	}
 
 	private function generateEntity(){
+		if(is_null(static::$app))
+			static::$app = app();
 		$entity = static::$app['path.base'].'/'. ( $this->entity?: static::$app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
 		$fs = new \Illuminate\Filesystem;
 		if (file_exists($entity))
