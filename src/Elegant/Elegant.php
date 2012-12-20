@@ -207,14 +207,14 @@ abstract class Elegant extends Model {
 	}
 
 	public function _isTrashed(){
-		if($this->softdelete)
-			return $this->{$this->softdelete};
+		if(!is_null($this->softDelete))
+			return $this->{$this->softDelete};
 		else
 			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
 	}
 	public function _deleted($val =1){
-		if($this->softdelete)
-			return $this->newQuery()->where($this->softdelete, '=',$val);
+		if(!is_null($this->softDelete))
+			return $this->newQuery()->where($this->softDelete, '=',$val);
 		else
 			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
 	}
@@ -235,7 +235,7 @@ abstract class Elegant extends Model {
 	}
 	public static function all($excSoftDeletes= true){
 		$instance = new static;
-		if(!is_null($instance->softdelete) and $excSoftDeletes)
+		if(!is_null($instance->softDelete) and $excSoftDeletes)
 			return static::deleted(0)->get();
 		return parent::all();
 	}
