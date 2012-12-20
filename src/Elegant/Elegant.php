@@ -180,7 +180,7 @@ class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public static function find($value, $col = null)
+	public static function find($value, $col = [])
 	{
 		$instance = new static;
 		if($instance->useCache)
