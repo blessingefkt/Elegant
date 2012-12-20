@@ -170,10 +170,8 @@ class Elegant extends Model {
 	{
 		if(!is_null($this->entity))
 		{
-			if($this->entity->hasAttribute($key))
-				return $this->entity->$key;
-			if($this->entity->$key)
-				return $this->entity->$key;
+			if(array_key_exists($this->entity, $key))
+				return $this->entityValue($key);
 		}
 		return parent::__get($key);
 	}
@@ -244,6 +242,13 @@ class Elegant extends Model {
 			$model = clone $this;
 			$this->entity = $fs->getRequire($entity);
 		}
+	}
+
+	public function entityValue($key){
+		if(is_null(static::$app))
+			static::$app = app();
+		$value = $this->entity[$key];
+		return $value instanceof Closure ? $value(static::$app) : $value;
 	}
 
 }
