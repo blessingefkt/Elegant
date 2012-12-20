@@ -8,5 +8,12 @@ abstract class Entity {
 		 $this->model and $this->{$this->modelName} = $model;
 	}
 
-
+	public function has($key){
+		return method_exists($this, $key);
+	}
+	public function __get($key)
+	{
+		if($this->has($key))
+			return $this->$key();
+	}
 }
