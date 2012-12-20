@@ -182,7 +182,7 @@ class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public static function find($value, $colms = [], $columns = array('*'))
+	public static function find($value, $colms = null, $columns = array('*'))
 	{
 		$instance = new static;
 		if($instance->useCache)
@@ -191,17 +191,9 @@ class Elegant extends Model {
 			if (Cache::has($cache_key))
 				return Cache::get($cache_key);
 		}
-		if (empty($colms))
+		if (is_null($colms))
 			return $instance->newQuery()->find($value, $columns);
-		if(is_string($colms))
-			return $instance->newQuery()->where($colms, '=', $value)->first($columns);
-		foreach ($colms as $r)
-		{
-			$result =$instance->newQuery()->where($r, '=', $value)->first($columns);
-			if( $result )
-				return $result;
-		}
-		return null;
+		return $instance->newQuery()->where($colms, '=', $value)->first($columns);
 	}
 
 	public function _isDeleted(){
