@@ -180,7 +180,7 @@ class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public static function find($value, $col = ['*'])
+	public static function find($value, $columns = array('*'))
 	{
 		$instance = new static;
 		if($instance->useCache)
@@ -190,8 +190,10 @@ class Elegant extends Model {
 				return Cache::get($cache_key);
 		}
 		if (is_array($col))
-			return $instance->newQuery()->find($value, $col);
-		return $instance->newQuery()->where($col, '=', $value)->first();
+			return parent::find($value, $columns );
+		if(is_string($columns))
+			return static::where($columns, '=', $value)->first();
+		return null;
 	}
 
 	public function _isDeleted(){
