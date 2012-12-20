@@ -21,7 +21,7 @@ abstract class Elegant extends Model {
 	public function __construct($attributes = array())
 	{
 		 parent::__construct($attributes);
-		 $this->errors = new Laravel\Messages();    // initialize empty messages object
+		 $this->errors = new \Illuminate\Support\MessageBag();    // initialize empty messages object
 		 $this->modelName = get_class($this);
 		  if(!is_null($this->entityName))
 		 {
