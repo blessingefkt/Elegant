@@ -2,7 +2,7 @@
 use Illuminate\Database\Eloquent\Model;
 abstract class Elegant extends Model {
 	public $timestamps = true;
-	public $autoSetCreator = 'creator_id';
+	public $autoSetCreator = null;
 	public $softDelete;
 	public  $entityName;
 	public $rules = array();
@@ -33,146 +33,139 @@ abstract class Elegant extends Model {
 	}
 	public function _initialize(){}
 	// /* Creator ****************************/
-	// public function creator()
-	// {
-	// 	if($foreignId = static::$autoSetCreator)
-	// 		return $this->belongs_to('User', $foreignId);
-	// }
-	// public function set_creator($user = null)
-	// {
-	// 	if(is_object($user))
-	// 		$user = $user->id;
-	// 	$this->set_attribute('creator_id', $user);
-	// }
+	public function creator()
+	{
+		if($foreignId = $this->autoSetCreator)
+			return $this->belongsTo('User', $foreignId);
+	}
 
-	// public function auto_set_creator(){
-	// 	$this->set_attribute(static::$autoSetCreator, Auth::user()->id);
-	// }
-	// public function url($type) {
-	// 	if($this->exists){
-	// 		$this->_init_urls();
-	// 		return $this->url[$type];
-	// 	}
-	// 	return null;
-	// }
+	private function autoSetCreator(){
+		$this->setAttribute($this->autoSetCreator, Auth::user()->id);
+	}
+	public function url($type) {
+		if($this->exists){
+			$this->_init_urls();
+			return $this->url[$type];
+		}
+		return null;
+	}
 
-	// public function _init_urls() {
-	// 	$base = static::$urlbase;
-	// 	if($base){
-	// 		$id = $this->key;
-	// 		$this->url['edit'] = action("{$base}@edit", [$id]);
-	// 		$this->url['view'] = action("{$base}@view", [$id]);
-	// 		$this->url['delete'] = action("{$base}@view", [$id]);
-	// 	}
-	// }
-	// /* Save ****************************/
-	// public function preNew() {}
-	// public function postNew() {}
-	// public function preSave() { return true; }
-	// public function postSave()
-	// {
-	// 	if(static::$useCache)
-	// 		Cache::forget(static::_get_cache_key($this->id));
-	// }
-	// public function save($validate=true, $preSave=null, $postSave=null)
-	// {
-	// 	$newRecord = !$this->exists;
-	// 	if ($validate)
-	// 		if (!$this->valid()) return false;
-	// 	if($newRecord)
-	// 		$this->preNew();
-	// 	if (static::$autoSetCreator)
-	// 		$this->auto_set_creator();
-	// 	$before = is_null($preSave) ? $this->preSave() : $preSave($this);
-	// 	  // check before & valid, then pass to parent
-	// 	$success = ($before) ? parent::save() : false;
-	// 	if ($success)
-	// 		is_null($postSave) ? $this->postSave() : $postSave($this);
-	// 	if($newRecord)
-	// 		$this->postNew();
-	// 	return $success;
-	// }
-	// public function onForceSave(){}
-	// public function forceSave($validate=true, $rules=array(), $messages=array(), $onForceSave=null)
-	// {
-	// 	if ($validate)
-	// 		$this->valid($rules, $messages);
-	// 	 $before = is_null($onForceSave) ? $this->onForceSave() : $onForceSave($this);  // execute onForceSave
-	// 	 return $before ? parent::save() : false; // save regardless of the result of validation
-	// }
-	// /* Delete ****************************/
-	// public function softDelete($val = true, $preDelete=null, $postDelete=null)
-	// {
-	// 	if ($this->exists)
-	// 	{
-	// 		$before = is_null($preDelete) ? $this->preDelete() : $preDelete($this);
-	// 		$success = null;
-	// 		if($before) {
-	// 			$this->set_attribute($this->softdelete, $val);
-	// 			$success = $this->save(false);
-	// 		}
-	// 		else
-	// 			$success = false;
-	// 		if ($success)
-	// 			is_null($postDelete) ? $this->postDelete() : $postDelete($this);
-	// 		return $success;
-	// 	}
-	// }
-	// public function preDelete()  { return true;}
-	// public function postDelete(){}
-	// public function delete($softDelete = true, $preDelete=null, $postDelete=null)
-	// {
-	// 	if ($this->softdelete and isset($this->original[$this->softdelete]))
-	// 		$success = $this->softDelete($softDelete, $preDelete, $postDelete);
-	// 	else
-	// 		$success = $this->hardDelete($preDelete, $postDelete);
-	// 	if($success and static::$useCache)
-	// 		Cache::forget(static::_get_cache_key($this->id));
-	// 	return $success;
-	// }
-	// /* Hard Delete ****************************/
-	// public function preHardDelete() {  return true;  }
-	// public function postHardDelete()  { }
-	// public function hardDelete( $preHardDelete=null, $postHardDelete=null)
-	// {
-	// 	if ($this->exists)
-	// 	{
-	// 		$before = is_null($preHardDelete) ? $this->preHardDelete() : $preHardDelete($this);
-	// 		$success = ($before) ? parent::delete() : false;
-	// 		if ($success)
-	// 			is_null($postHardDelete) ? $this->postHardDelete() : $postHardDelete($this);
-	// 		return $success;
-	// 	}
-	// }
+	public function _init_urls() {
+		$base = $this->urlbase;
+		if($base){
+			$id = $this->key;
+			$this->url['edit'] = action("{$base}@edit", [$id]);
+			$this->url['view'] = action("{$base}@view", [$id]);
+			$this->url['delete'] = action("{$base}@view", [$id]);
+		}
+	}
+	/* Save ****************************/
+	public function preNew() {}
+	public function postNew() {}
+	public function preSave() { return true; }
+	public function postSave()
+	{
+		if($this->useCache)
+			Cache::forget($this->getCacheKey($this->id));
+	}
+	public function save($validate=true, $preSave=null, $postSave=null)
+	{
+		$newRecord = !$this->exists;
+		if ($validate)
+			if (!$this->valid()) return false;
+		if($newRecord)
+			$this->preNew();
+		if ($this->autoSetCreator)
+			$this->autoSetCreator();
+		$before = is_null($preSave) ? $this->preSave() : $preSave($this);
+		  // check before & valid, then pass to parent
+		$success = ($before) ? parent::save() : false;
+		if ($success)
+			is_null($postSave) ? $this->postSave() : $postSave($this);
+		if($newRecord)
+			$this->postNew();
+		return $success;
+	}
+	public function onForceSave(){}
+	public function forceSave($validate=true, $rules=array(), $messages=array(), $onForceSave=null)
+	{
+		if ($validate)
+			$this->valid($rules, $messages);
+		 $before = is_null($onForceSave) ? $this->onForceSave() : $onForceSave($this);  // execute onForceSave
+		 return $before ? parent::save() : false; // save regardless of the result of validation
+	}
+	/** Soft Delete ****************************/
+	public function preSoftDelete() {  return true;  }
+	public function postSoftDelete()  { }
+	public function softDelete($val = true, $preSoftDelete=null, $postSoftDelete=null)
+	{
+		if ($this->exists)
+		{
+			$before = is_null($preSoftDelete) ? $this->preSoftDelete() : $preSoftDelete($this);
+			$success = null;
+			if($before) {
+				$this->setAttribute($this->softDelete, $val);
+				$success = $this->save(false);
+			}
+			else
+				$success = false;
+			if ($success)
+			{
+				is_null($postSoftDelete) ? $this->postSoftDelete() : $postSoftDelete($this);
+				if($success and $this->useCache)
+						Cache::forget($this->getCacheKey($this->id));
+			 }
+			return $success;
+		}
+	}
 
-	// /* Validate ****************************/
-	// public function valid( $rules=array(), $messages=array())
-	// {
-	// 	 $valid = true;// innocent until proven guilty
-	// 	 if(!empty($rules) || !empty(static::$rules))
-	// 	 {
-	// 		$rules = (empty($rules)) ? static::$rules : $rules;// check for overrides
-	// 		if (!empty($this->ruleSubs))
-	// 			$rules = $this->ruleSubs +  $rules;
-	// 		$messages = (empty($messages)) ? static::$messages : $messages;
-	// 		if ($this->exists) // if the model exists, this is an update
-	// 		{
-	// 			$data = $this->get_dirty();
-	// 			$rules = array_intersect_key($rules, $data); // so just validate the fields that are being updated
-	// 		}
-	// 		else
-	// 		 	$data = $this->attributes;// otherwise validate everything!
+	/** Hard Delete ****************************/
+	public function preDelete()  { return true;}
+	public function postDelete(){}
+	public function delete( $preDelete=null, $postDelete=null)
+	{
+		if ($this->exists)
+		{
+			$before = is_null($preDelete) ? $this->preDelete() : $preDelete($this);
+			$success = ($before) ? parent::delete() : false;
+			if ($success)
+			{
+			 	is_null($postDelete) ? $this->postDelete() : $postDelete($this);
+			 	if($success and $this->useCache)
+					Cache::forget($this->getCacheKey($this->id));
+			 }
+			return $success;
+		}
+	}
 
-	// 		$validator = Validator::make($data, $rules, $messages);// construct the validator
-	// 		$valid = $validator->valid();
+	/* Validate ****************************/
+	public function valid( $rules=array(), $messages=array())
+	{
+		 $valid = true;// innocent until proven guilty
+		 if(!empty($rules) || !empty($this->rules))
+		 {
+			$rules = (empty($rules)) ? $this->rules : $rules;// check for overrides
+			if (!empty($this->ruleSubs))
+				$rules = $this->ruleSubs +  $rules;
+			$messages = (empty($messages)) ? $this->messages : $messages;
+			if ($this->exists) // if the model exists, this is an update
+			{
+				$data = $this->get_dirty();
+				$rules = array_intersect_key($rules, $data); // so just validate the fields that are being updated
+			}
+			else
+			 	$data = $this->attributes;// otherwise validate everything!
 
-	// 		if($valid) // if the model is valid, unset old errors
-	// 		$this->errors->messages = array();
-	// 		else // otherwise set the new ones
-	// 		$this->errors = $validator->errors;
-	// 	}
-	// 	return $valid;
-	// }
+			$validator = Validator::make($data, $rules, $messages);// construct the validator
+			$valid = $validator->valid();
+
+			if($valid) // if the model is valid, unset old errors
+			$this->errors->messages = array();
+			else // otherwise set the new ones
+			$this->errors = $validator->errors;
+		}
+		return $valid;
+	}
  //  /**
 	// * Set an attribute's value on the model.
 	// *
@@ -180,13 +173,13 @@ abstract class Elegant extends Model {
 	// * @param  mixed   $value
 	// * @return void
 	// */
-	// public function set_attribute($key, $value)
+	// public function setAttribute($key, $value)
 	// {
-	// 	if(isset(static::$processors[$key])){
-	// 		$processor = static::$processors[$key];
+	// 	if(isset($this->processors[$key])){
+	// 		$processor = $this->processors[$key];
 	// 		$value = $processor->setData($value)->runActions()->getData();
 	// 	}
-	// 	return parent::set_attribute($key, $value);
+	// 	return parent::setAttribute($key, $value);
 	// }
 
 	// public function get_attribute($key)
@@ -217,22 +210,21 @@ abstract class Elegant extends Model {
 
 	// }
 
-	// public function __get($key)
-	// {
-	// 	if(!is_null($this->entity))
-	// 	{
-	// 		if($this->entity->hasAttribute($key))
-	// 			return $this->entity->$key;
-	// 		if($this->entity->$key)
-	// 			return $this->entity->$key;
-	// 	}
-
-	// 	return parent::__get($key);
-	// }
-	// private function _get_cache_key($id)
-	// {
-	// 	return 'model_'.static::table().'_'.$id;
-	// }
+	public function __get($key)
+	{
+		if(!is_null($this->entity))
+		{
+			if($this->entity->hasAttribute($key))
+				return $this->entity->$key;
+			if($this->entity->$key)
+				return $this->entity->$key;
+		}
+		return parent::__get($key);
+	}
+	private function getCacheKey($id)
+	{
+		return 'model_'.$this->table.'_'.$id;
+	}
 	// private function getAttrProcessorInfo($attrOpts){
 	// 	$attrOpts = (array) $attrOpts;
 	//  	$actions = [];
@@ -245,29 +237,29 @@ abstract class Elegant extends Model {
 	//  	return new Processor( $actions,  $settings);
 	// }
 
-	// public function _find($id, $column = null, $columns = array('*'))
-	// {
-	// 	if(static::$useCache)
-	// 	{
-	// 		$cache_key = static::_get_cache_key($id);
-	// 		if (Cache::has($cache_key))
-	// 			return Cache::get($cache_key);
-	// 	}
-	// 	if (is_null($column))
-	// 		$column = static::$key;
-	// 	if (is_array($column))
-	// 	{
-	// 		foreach ($column as $r)
-	// 		{
-	// 			$result = $this->query()->where($r, '=', $id)->first($columns);
-	// 			if( $result )
-	// 				return $result;
-	// 		}
-	// 		return null;
-	// 	}
-	// 	else
-	// 		return $this->query()->where($column, '=', $id)->first($columns);
-	// }
+	public function _find($id, $column = null, $columns = array('*'))
+	{
+		if($this->useCache)
+		{
+			$cache_key = $this->getCacheKey($id);
+			if (Cache::has($cache_key))
+				return Cache::get($cache_key);
+		}
+		if (is_null($column))
+			$column = $this->key;
+		if (is_array($column))
+		{
+			foreach ($column as $r)
+			{
+				$result = $this->query()->where($r, '=', $id)->first($columns);
+				if( $result )
+					return $result;
+			}
+			return null;
+		}
+		else
+			return $this->query()->where($column, '=', $id)->first($columns);
+	}
 
 	// /* STATIC FUNCTIONS ****************************/
 	// public static function dne($id)
