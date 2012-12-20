@@ -1,7 +1,7 @@
 <?php namespace Elegant;
 use Illuminate\Database\Eloquent\Model;
 use Cache;
-abstract class Elegant extends Model {
+class Elegant extends Model {
 	  /**
 	   * Illuminate application instance.
 	   * @var Illuminate/Foundation/Application
