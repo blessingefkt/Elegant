@@ -1,5 +1,6 @@
 <?php namespace Elegant;
 use Illuminate\Database\Eloquent\Model;
+use Cache;
 abstract class Elegant extends Model {
 	public $timestamps = true;
 	public $autoSetCreator = null;
