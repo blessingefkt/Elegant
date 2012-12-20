@@ -58,8 +58,8 @@ abstract class Elegant extends Model {
 		}
 	}
 	/* Save ****************************/
-	public function preNew() {}
-	public function postNew() {}
+	public function preCreate() {}
+	public function postCreate() {}
 	public function preSave() { return true; }
 	public function postSave()
 	{
@@ -72,7 +72,7 @@ abstract class Elegant extends Model {
 		if ($validate)
 			if (!$this->valid()) return false;
 		if($newRecord)
-			$this->preNew();
+			$this->preCreate();
 		if ($this->autoSetCreator)
 			$this->autoSetCreator();
 		$before = is_null($preSave) ? $this->preSave() : $preSave($this);
@@ -81,7 +81,7 @@ abstract class Elegant extends Model {
 		if ($success)
 			is_null($postSave) ? $this->postSave() : $postSave($this);
 		if($newRecord)
-			$this->postNew();
+			$this->postCreate();
 		return $success;
 	}
 	public function onForceSave(){}
@@ -224,8 +224,8 @@ abstract class Elegant extends Model {
 	}
 
 	public static function deleted($val =1){
-		$delete = "where_".$this->softdelete;
-		return static::{$delete}($val);
+		$model  = new static;
+		return static::where($model->softdelete, '=',$val);
 	}
 
 }
