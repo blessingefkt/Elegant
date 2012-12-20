@@ -20,6 +20,8 @@ abstract class Elegant extends Model {
 	public function __construct($attributes = array())
 	{
 		 parent::__construct($attributes);
+		 if( ! is_null($this->getKey()) )
+		 	$this->exists = !static::dne($this->getKey());
 		  // initialize empty messages object
 		 $this->errors = new \Illuminate\Support\MessageBag();
 		 $this->modelName = get_class($this);
@@ -152,16 +154,16 @@ abstract class Elegant extends Model {
 				$data = $this->get_dirty();
 				$rules = array_intersect_key($rules, $data); // so just validate the fields that are being updated
 			}
-			else
-			 	$data = $this->attributes;// otherwise validate everything!
+			else // otherwise validate everything!
+			 	$data = $this->attributes;
 
 			$validator = Validator::make($data, $rules, $messages);// construct the validator
 			$valid = $validator->valid();
 
 			if($valid) // if the model is valid, unset old errors
-			$this->errors->messages = array();
+				$this->errors->messages = array();
 			else // otherwise set the new ones
-			$this->errors = $validator->errors;
+				$this->errors = $validator->errors;
 		}
 		return $valid;
 	}
@@ -223,8 +225,7 @@ abstract class Elegant extends Model {
 	// /* STATIC FUNCTIONS ****************************/
 	public static function dne($id)
 	{
-		$instance  = new static;
-		if ($instance->_find($id))
+		if (static::find($id))
 			return false;
 		return true;
 	}
