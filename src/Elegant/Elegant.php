@@ -181,41 +181,56 @@ abstract class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public function _find($id, $column = null, $columns = array('*'))
+	public function _find($value, $colms = null, $columns = array('*'))
 	{
 		if($this->useCache)
 		{
-			$cache_key = $this->getCacheKey($id);
+			$cache_key = $this->getCacheKey($value);
 			if (Cache::has($cache_key))
 				return Cache::get($cache_key);
 		}
-		if (is_null($column))
-			$column = $this->key;
-		if (is_array($column))
+		if (is_null($colms))
+			$colms = $this->key;
+		if (is_array($colms))
 		{
-			foreach ($column as $r)
+			foreach ($colms as $r)
 			{
-				$result = $this->query()->where($r, '=', $id)->first($columns);
+				$result =$this->newQuery()->where($r, '=', $value)->first($columns);
 				if( $result )
 					return $result;
 			}
 			return null;
 		}
 		else
-			return $this->query()->where($column, '=', $id)->first($columns);
+			return $this->newQuery()->where($colms, '=', $value)->first($columns);
+	}
+
+	public function _isTrashed(){
+		if($this->softdelete)
+			return $this->{$this->softdelete};
+		else
+			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
+	}
+	public function _deleted($val =1){
+		if($this->softdelete)
+			return $this->newQuery()->where($this->softdelete, '=',$val);
+		else
+			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
 	}
 
 	// /* STATIC FUNCTIONS ****************************/
 	public static function dne($id)
 	{
-		if (static::find($id))
+		$instance  = new static;
+		if ($instance->_find($id))
 			return false;
 		return true;
 	}
 	public static function isTrashed($id)
 	{
-		$o = static::find($id);
-		return $o->delete;
+		$instance = new static;
+		$instance = $instance->_find($id);
+		return $instance->_isTrashed();
 	}
 	public static function all($excSoftDeletes= true){
 		if($this->softdelete and $excSoftDeletes)
@@ -224,11 +239,8 @@ abstract class Elegant extends Model {
 	}
 
 	public static function deleted($val =1){
-		$model  = new static;
-		if($model->softdelete)
-			return static::where($model->softdelete, '=',$val);
-		else
-			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for {$model->modelName}.");
+		$instance  = new static;
+		return $instance->_deleted($val);
 	}
 
 }
