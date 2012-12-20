@@ -6,7 +6,7 @@ class Elegant extends Model {
 	   * Illuminate application instance.
 	   * @var Illuminate/Foundation/Application
 	   */
-	public static $app;
+	public $app;
 	public $timestamps = true;
 	public $autoSetCreator = null;
 	public $softDelete;
@@ -180,23 +180,24 @@ class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public static function find($value, $columns = array('*'))
-	{
-		$instance = new static;
-		dm($value);
-		if($instance->useCache)
+	private function generateEntity(){
+		if(is_null($this->app))
+			$this->app = app();
+		$entity = $this->app['path.base'].'/'. ( $this->entity?: $this->app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
+		$fs = new \Illuminate\Filesystem;
+		if (file_exists($entity))
 		{
-			$cache_key = $instance->getCacheKey($value);
-			if (Cache::has($cache_key))
-				return Cache::get($cache_key);
+			$model = clone $this;
+			$this->entity = $fs->getRequire($entity);
 		}
-		if (is_array($columns))
-			return parent::find($value, $columns );
-		if(is_string($columns))
-			return static::where($columns, '=', $value)->first();
-		return null;
 	}
 
+	public function entityValue($key){
+		if(is_null($this->app))
+			$this->app = app();
+		$value = $this->entity[$key];
+		return $value instanceof Closure ? $value($this->app) : $value;
+	}
 	public function _isDeleted(){
 		if(!is_null($this->softDelete))
 			return $this->{$this->softDelete};
@@ -235,23 +236,25 @@ class Elegant extends Model {
 		return $instance->_deleted($val);
 	}
 
-	private function generateEntity(){
-		if(is_null(static::$app))
-			static::$app = app();
-		$entity = static::$app['path.base'].'/'. ( $this->entity?: static::$app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
-		$fs = new \Illuminate\Filesystem;
-		if (file_exists($entity))
+	public static function find($value, $columns = array('*'))
+	{
+		$instance = new static;
+		if($instance->useCache)
 		{
-			$model = clone $this;
-			$this->entity = $fs->getRequire($entity);
+			$cache_key = $instance->getCacheKey($value);
+			if (Cache::has($cache_key))
+				return Cache::get($cache_key);
 		}
-	}
-
-	public function entityValue($key){
-		if(is_null(static::$app))
-			static::$app = app();
-		$value = $this->entity[$key];
-		return $value instanceof Closure ? $value(static::$app) : $value;
+		if (is_array($columns))
+			return parent::find($value, $columns );
+		if(is_string($columns))
+			return static::where($columns, '=', $value)->first();
+		return null;
 	}
 
 }
+// public  static function retrieve($key, $val)
+// 	{
+// 		$instance = new static;
+// 		return $instance->newQuery()->where($key, '=', $val)->first();
+// 	}

@@ -14,13 +14,7 @@ class ElegantServiceProvider extends ServiceProvider {
 	   * Register the application bindings.
 	   * @return void
 	   */
-	  public function registerBindings()
-	  {
-	  	$this->app['elegant'] = $this->app->share(function($app) {
-	  		Elegant::$app = $app;
-	  		return new Elegant;
-	  	});
-	  }
+	  public function registerBindings()  {   }
 
 	  /**
 	   * Get the services provided by the provider.
