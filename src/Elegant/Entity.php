@@ -5,7 +5,7 @@ abstract class Entity {
 
 	public function __construct($model)
 	{
-		 $this->model and $this->{$this->modelName} = $model;
+		 $this->model and $this->{static::$modelName} = $model;
 	}
 
 	public function has($key){
