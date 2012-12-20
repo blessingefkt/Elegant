@@ -6,7 +6,7 @@ class Elegant extends Model {
 	   * Illuminate application instance.
 	   * @var Illuminate/Foundation/Application
 	   */
-	protected $app;
+	public static $app;
 	public $timestamps = true;
 	public $autoSetCreator = null;
 	public $softDelete;
@@ -21,10 +21,9 @@ class Elegant extends Model {
 	public $ttl = 20; // Time To Live - for cache
 	protected $url = array();
 
-	public function __construct($attributes = array(), $app = null)
+	public function __construct($attributes = array())
 	{
 		 parent::__construct($attributes);
-		 $this->app = $app;
 		 // if( ! is_null($this->getKey()) )
 		 // 	$this->exists = !static::dne($this->getKey());
 		  // initialize empty messages object
@@ -247,7 +246,7 @@ class Elegant extends Model {
 	}
 
 	private function generateEntity(){
-		$entity = $this->app['path.base'].'/'. ( $this->entity?: $this->app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
+		$entity = static::$app['path.base'].'/'. ( $this->entity?: static::$app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
 		$fs = new \Illuminate\Filesystem;
 		if (file_exists($entity))
 		{
