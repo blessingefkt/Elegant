@@ -11,8 +11,6 @@ abstract class Elegant extends Model {
 	public $errors;
 	public $modelName = null;
 	public $urlbase = null;
-	public $processorOpts= array();
-	public $processors = [];
 	public $entity = null;
 	public $useCache = true;
 	public $ttl = 20; // Time To Live - for cache
@@ -166,49 +164,6 @@ abstract class Elegant extends Model {
 		}
 		return $valid;
 	}
- //  /**
-	// * Set an attribute's value on the model.
-	// *
-	// * @param  string  $key
-	// * @param  mixed   $value
-	// * @return void
-	// */
-	// public function setAttribute($key, $value)
-	// {
-	// 	if(isset($this->processors[$key])){
-	// 		$processor = $this->processors[$key];
-	// 		$value = $processor->setData($value)->runActions()->getData();
-	// 	}
-	// 	return parent::setAttribute($key, $value);
-	// }
-
-	// public function get_attribute($key)
-	// {
-	// 	$value = parent::get_attribute($key);
-	// 	return $value;
-	// }
-
-	// public function only($atts = array())
-	// {
-	// 	$atts = (array) $atts;
-	// 	$output = array_flip($atts );
-	// 	foreach ($atts as $name)
-	// 		$output[$name] = $this->$name;
-	// 	return $output;
-	// }
-	// public function onlyFluent($atts = array())
-	// {
-	// 	return  new \Laravel\Fluent( $this->only($atts) );
-	// }
-
-	// public function __set($key, $value)
-	// {
-	// 	if (!array_key_exists($key, $this->attributes) || $value !== $this->$key)
-	// 	{
-	// 		parent::__set($key, $value);
-	// 	}
-
-	// }
 
 	public function __get($key)
 	{
@@ -225,17 +180,6 @@ abstract class Elegant extends Model {
 	{
 		return 'model_'.$this->table.'_'.$id;
 	}
-	// private function getAttrProcessorInfo($attrOpts){
-	// 	$attrOpts = (array) $attrOpts;
-	//  	$actions = [];
-	//  	$settings = [];
-	// 	foreach ($attrOpts as $key => $value) {
-	//  			$actions[] = (is_numeric($key)) ? $value : $key;
-	// 	 		if(is_array($value))
-	// 	 			$settings[$key] = $value;
-	// 	 	}
-	//  	return new Processor( $actions,  $settings);
-	// }
 
 	public function _find($id, $column = null, $columns = array('*'))
 	{
@@ -262,43 +206,26 @@ abstract class Elegant extends Model {
 	}
 
 	// /* STATIC FUNCTIONS ****************************/
-	// public static function dne($id)
-	// {
-	// 	if (static::find($id))
-	// 		return false;
-	// 	return true;
-	// }
-	// public static function isTrashed($id)
-	// {
-	// 	$o = static::find($id);
-	// 	return $o->delete;
-	// }
-	// public static function all($includeDeleted = true){
-	// 	if($this->softdelete and $includeDeleted)
-	// 		return static::deleted(0)->get();
-	// 	return parent::all();
-	// }
+	public static function dne($id)
+	{
+		if (static::find($id))
+			return false;
+		return true;
+	}
+	public static function isTrashed($id)
+	{
+		$o = static::find($id);
+		return $o->delete;
+	}
+	public static function all($excSoftDeletes= true){
+		if($this->softdelete and $excSoftDeletes)
+			return static::deleted(0)->get();
+		return parent::all();
+	}
 
-	// public static function deleted($val =1){
-	// 	$delete = "where_".$this->softdelete;
-	// 	return static::{$delete}($val);
-	// }
-
-	// public static function property_array($objs, $propId = 'id', $prop= null)
-	// {
-	// 	if(!is_array($orig = $objs))
-	// 		$objs = array($orig);
-	// 	$output = [];
-	// 	foreach ($objs as $o)
-	// 	{
-	// 		if($prop)
-	// 			$output[$o->{$propId}] = $o->{$prop};
-	// 		else
-	// 			array_push($output, $o->{$propId});
-	// 	}
-
-	// 	return $output;
-	// }
-
+	public static function deleted($val =1){
+		$delete = "where_".$this->softdelete;
+		return static::{$delete}($val);
+	}
 
 }
