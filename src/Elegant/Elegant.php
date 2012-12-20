@@ -24,7 +24,7 @@ abstract class Elegant extends Model {
 		  // initialize empty messages object
 		 $this->errors = new \Illuminate\Support\MessageBag();
 		 $this->modelName = get_class($this);
-		  // if(!is_null($this->entityName))
+		  if(!is_null($this->entityName))
 		 {
 		 	$entityName = $this->entityName;
 			$this->entity = new $entityName($this);
