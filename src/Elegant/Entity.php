@@ -5,7 +5,8 @@ abstract class Entity {
 
 	public function __construct($model)
 	{
-		 $this->model and $this->{static::$modelName} = $model;
+		 $this->model  = $model;
+		 $this->{static::$modelName} = $this->model;
 	}
 
 	public function has($key){
@@ -15,5 +16,18 @@ abstract class Entity {
 	{
 		if($this->has($key))
 			return $this->$key();
+	}
+
+	public function toArray() {
+		$ents =  array_map( function($item)  {
+			return $item;
+		},  get_class_methods($this) );
+		$output = array();
+		foreach ($ents as $k)
+			$output[$k] = $this->$k();
+		return $output;
+	}
+	public function toJson(){
+		return json_encode($this->toArray());
 	}
 }
