@@ -164,8 +164,6 @@ class Elegant extends Model {
 		if($this->entity())
 			if($this->entity()->has($key))
 				return $this->entity()->$key;
-		if($key =='entity')
-			return $this->entity();
 		return parent::__get($key);
 	}
 	private function getCacheKey($id)

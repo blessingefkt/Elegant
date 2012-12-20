@@ -17,7 +17,6 @@ abstract class Entity {
 		if($this->has($key))
 			return $this->$key();
 	}
-
 	public function toArray() {
 		$ents =  array_map( function($item)  {
 			return $item;
