@@ -248,7 +248,7 @@ class Elegant extends Model {
 
 	private function generateEntity(){
 		$entity = $this->app['path.base'].'/'. ( $this->entity?: $this->app['config']->get('elegant::entitiesPath').'/'. $this->modelName.'.php' );
-		$fs = new Illuminate\Filesystem;
+		$fs = new \Illuminate\Filesystem;
 		if (file_exists($entity))
 		{
 			$model = clone $this;
