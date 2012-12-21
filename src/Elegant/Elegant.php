@@ -209,11 +209,6 @@ class Elegant extends Model {
 			return false;
 		return true;
 	}
-	public static function isDeleted($id)
-	{
-		$instance = static::find($id);
-		return $instance->isDeleted();
-	}
 	public static function all($excSoftDeletes= true){
 		$instance = new static;
 		if(!is_null($instance->softDelete) and $excSoftDeletes)
