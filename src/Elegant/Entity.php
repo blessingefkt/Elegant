@@ -2,7 +2,7 @@
 abstract class Entity {
 	public  $model = null;
 	public static $modelName = 'resource';
-	private $attributes;
+	public $excluded =  array('toArray', 'genAttributes', 'toJson', '__get', 'has', '__construct');
 
 	public function __construct($model)
 	{
@@ -11,29 +11,28 @@ abstract class Entity {
 	}
 
 	public function has($key){
-		return method_exists($this, $key);
+		return (method_exists($this, $key) );
 	}
 	public function __get($key)
 	{
+		if($key == 'attributes')
+			return $this->genAttributes();
 		if($this->has($key))
 			return $this->$key();
+		return parent::__get($key);
 	}
 	public function toArray() {
-		$ents =  array_map( function($item)  {
-			return $item;
-		},  get_class_methods($this) );
+		return $this->genAttributes();
+	}
+	public function genAttributes()
+	{
 		$output = array();
-		foreach ($ents as $k)
+		$methods = array_diff(get_class_methods($this), $this->excluded);
+		foreach ($methods as $k)
 			$output[$k] = $this->$k();
 		return $output;
 	}
-	public function attributes()
-	{
-		if(is_null($this->attributes))
-			$this->attributes = $this->toArray();
-		return $this->attributes;
-	}
 	public function toJson(){
-		return json_encode($this->toArray());
+		return json_encode($this->genAttributes());
 	}
 }
