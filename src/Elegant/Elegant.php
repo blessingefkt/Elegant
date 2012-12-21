@@ -190,6 +190,17 @@ class Elegant extends Model {
 		else
 			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
 	}
+	/**
+	 * Convert the model instance to an array.
+	 * @return array
+	 */
+	public function toArray()
+	{
+		$attributes = parent::toArray();
+		if($this->entity)
+			$attributes = array_merge($attributes, $this->entity()->toArray());
+		return $attributes;
+	}
 
 	// /* STATIC FUNCTIONS ****************************/
 	public static function dne($id)
