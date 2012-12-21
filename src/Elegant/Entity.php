@@ -30,7 +30,7 @@ abstract class Entity {
 	public function attributes()
 	{
 		if(is_null($this->attributes))
-			return $this->toArray();
+			$this->attributes = $this->toArray();
 		return $this->attributes;
 	}
 	public function toJson(){

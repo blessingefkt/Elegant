@@ -197,7 +197,7 @@ class Elegant extends Model {
 	public function toArray()
 	{
 		$attributes = parent::toArray();
-		if($this->entity())
+		if(!is_null($this->entity()))
 			$attributes = array_merge($attributes, $this->entity()->toArray());
 		return $attributes;
 	}
