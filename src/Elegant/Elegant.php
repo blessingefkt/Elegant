@@ -178,13 +178,13 @@ class Elegant extends Model {
 		}
 		return $this->entity;
 	}
-	public function _isDeleted(){
+	public function isDeleted(){
 		if(!is_null($this->softDelete))
 			return $this->{$this->softDelete};
 		else
 			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
 	}
-	public function _deleted($val =1){
+	public function deleted($val =1){
 		if(!is_null($this->softDelete))
 			return $this->newQuery()->where($this->softDelete, '=',$val);
 		else
@@ -211,20 +211,19 @@ class Elegant extends Model {
 	}
 	public static function isDeleted($id)
 	{
-		$instance = new static;
-		$instance = $instance->_find($id);
-		return $instance->_isDeleted();
+		$instance = static::find($id);
+		return $instance->isDeleted();
 	}
 	public static function all($excSoftDeletes= true){
 		$instance = new static;
 		if(!is_null($instance->softDelete) and $excSoftDeletes)
-			return static::deleted(0)->get();
+			return static::discarded(0)->get();
 		return parent::all();
 	}
 
-	public static function deleted($val =1){
+	public static function discarded($val =1){
 		$instance  = new static;
-		return $instance->_deleted($val);
+		return $instance->deleted($val);
 	}
 
 	public static function find($value, $columns = array('*'))
