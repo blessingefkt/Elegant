@@ -2,11 +2,12 @@
 abstract class Entity {
 	public  $model = null;
 	public static $modelName = 'resource';
+	private $attributes;
 
 	public function __construct($model)
 	{
-		 $this->model  = $model;
-		 $this->{static::$modelName} = $this->model;
+		$this->model  = $model;
+		$this->{static::$modelName} = $this->model;
 	}
 
 	public function has($key){
@@ -25,6 +26,12 @@ abstract class Entity {
 		foreach ($ents as $k)
 			$output[$k] = $this->$k();
 		return $output;
+	}
+	public function attributes()
+	{
+		if(is_null($this->attributes))
+			return $this->toArray();
+		return $this->attributes;
 	}
 	public function toJson(){
 		return json_encode($this->toArray());
