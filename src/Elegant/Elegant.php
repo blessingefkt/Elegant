@@ -24,7 +24,7 @@ class Elegant extends Model {
 		 $this->modelName = get_class($this);
 
 	}
-	// /* Creator ****************************/
+	/* Creator ****************************/
 	public function creator()
 	{
 		if($foreignId = $this->autoSetCreator)
@@ -86,7 +86,7 @@ class Elegant extends Model {
 		 $before = is_null($onForceSave) ? $this->onForceSave() : $onForceSave($this);  // execute onForceSave
 		 return $before ? parent::save() : false; // save regardless of the result of validation
 	}
-	/** Soft Delete ****************************/
+	/* Soft Delete ****************************/
 	public function preSoftDelete() {  return true;  }
 	public function postSoftDelete()  { }
 	public function softDelete($val = true, $preSoftDelete=null, $postSoftDelete=null)
@@ -111,7 +111,7 @@ class Elegant extends Model {
 		}
 	}
 
-	/** Hard Delete ****************************/
+	/* Hard Delete ****************************/
 	public function preDelete()  { return true;}
 	public function postDelete(){}
 	public function delete( $preDelete=null, $postDelete=null)
@@ -201,8 +201,17 @@ class Elegant extends Model {
 			$attributes = array_merge($attributes, $this->entity()->toArray());
 		return $attributes;
 	}
+	/**
+	 * Wrap a collection of objects with an array
+	 * @return array
+	 */
+	public function arrayWrap($collection)
+	{
+		$collection = (array) $collection;
+		return array_pop($collection);
+	}
 
-	// /* STATIC FUNCTIONS ****************************/
+	/* STATIC FUNCTIONS ****************************/
 	public static function dne($id)
 	{
 		if (static::find($id))
