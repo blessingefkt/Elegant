@@ -246,7 +246,7 @@ class Elegant extends Model {
 		return null;
 	}
 
-	public static __callStatic($meth, $args){
+	public static function __callStatic($meth, $args){
 		if(starts_with($meth, 'find_')){
 			$instance = new static;
 			return $instance->newQuery()->where($meth, '=',
