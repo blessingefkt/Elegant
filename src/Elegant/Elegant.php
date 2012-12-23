@@ -240,10 +240,19 @@ class Elegant extends Model {
 				return Cache::get($cache_key);
 		}
 		if (is_array($columns))
-			return parent::find($value, $columns );
+			return $instance->newQuery()->find($value, $columns );
 		if(is_string($columns))
-			return static::where($columns, '=', $value)->first();
+			return $instance->newQuery()->where($columns, '=', $value)->first();
 		return null;
+	}
+
+	public static __callStatic($meth, $args){
+		if(starts_with($meth, 'find_')){
+			$instance = new static;
+			return $instance->newQuery()->where($meth, '=',
+			substr($meth, 5));
+		}
+		return parent::__callStatic($meth, $args);
 	}
 
 }
