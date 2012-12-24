@@ -1,4 +1,5 @@
 <?php namespace Elegant;
+use ArrayAccess, Iterator, Countable, Serializable;
 class Collection implements ArrayAccess, Iterator, Countable, Serializable
 {
 	protected $_position = 0;
