@@ -39,6 +39,10 @@ class SmartCollection implements ArrayAccess, Iterator, Countable, Serializable
 
 		}, $this->container);
 	}
+	public function arrayWrap()
+	{
+		return (array($this->container));
+	}
 
 	public function toJson()
 	{
@@ -120,7 +124,7 @@ class SmartCollection implements ArrayAccess, Iterator, Countable, Serializable
 	}
 
 	public function __set($key, $value){
-		if($this->class)
+		if(!is_null($this->class))
 			$value = $this->newInstance($value);
 		return $this->offsetSet($key, $value);
 	}
