@@ -11,6 +11,8 @@ class Collection implements ArrayAccess, Iterator, Countable, Serializable
 	}
 
 	public function newInstance($item){
+		if($item instanceOf $this->class)
+			return $item;
 		$class = $this->class;
 		return new $class($item);
 	}
