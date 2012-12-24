@@ -16,7 +16,7 @@ class Collection implements ArrayAccess, Iterator, Countable, Serializable
 		if($class){
 			$this->class = $class;
 			foreach ($collection as $k => $item)
-				$this->add($k,  $item);
+				$this->add($item, $k);
 		}
 		else
 			$this->container = $collection;
