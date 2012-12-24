@@ -11,7 +11,7 @@ class Elegant extends Model {
 	public $errors;
 	public $modelName = null;
 	public $urlbase = null;
-	public $entity;
+	public $entity = null;
 	public $useCache = true;
 	public $ttl = 20; // Time To Live - for cache
 	// protected $url = array();
@@ -171,13 +171,6 @@ class Elegant extends Model {
 		return 'model_'.$this->table.'_'.$id;
 	}
 
-	public function entity(){
-		if(is_string($this->entity)){
-			$name = $this->entity;
-			$this->entity = new $name($this);
-		}
-		return $this->entity;
-	}
 	public function isDeleted(){
 		if(!is_null($this->softDelete))
 			return $this->{$this->softDelete};
@@ -209,6 +202,14 @@ class Elegant extends Model {
 	{
 		$collection = (array) $collection;
 		return array_pop($collection);
+	}
+
+	public function entity(){
+		if(is_string($this->entity)){
+			$name = '\\'.$this->entity;
+			$this->entity = new $name($this);
+		}
+		return $this->entity;
 	}
 
 	/* STATIC FUNCTIONS ****************************/
