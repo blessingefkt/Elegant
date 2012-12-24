@@ -23,11 +23,11 @@ class Collection implements ArrayAccess, Iterator, Countable, Serializable
 		else
 			$this->container = $collection;
 	}
-	public function add($item)
+	public function add($item, $index = null)
 	{
 		if($this->class)
 			$item = $this->newInstance($item);
-		$this->container[] = $item;
+		$this->container[$index] = $item;
 	}
 	public function first()
 	{
