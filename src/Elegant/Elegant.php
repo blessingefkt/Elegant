@@ -159,13 +159,6 @@ class Elegant extends Model {
 		return $valid;
 	}
 
-	public function __get($key)
-	{
-		if($this->entity())
-			if($this->entity()->has($key))
-				return $this->entity()->$key;
-		return parent::__get($key);
-	}
 	private function getCacheKey($id)
 	{
 		return 'model_'.$this->table.'_'.$id;
@@ -209,7 +202,17 @@ class Elegant extends Model {
 			$name = '\\'.$this->entity;
 			$this->entity = new $name($this);
 		}
+		else
+			$this->entity = null;
 		return $this->entity;
+	}
+
+	public function __get($key)
+	{
+		if($this->entity())
+			if($this->entity()->has($key))
+				return $this->entity()->$key;
+		return parent::__get($key);
 	}
 
 	/* STATIC FUNCTIONS ****************************/
@@ -229,22 +232,6 @@ class Elegant extends Model {
 	public static function discarded($val =1){
 		$instance  = new static;
 		return $instance->deleted($val);
-	}
-
-	public static function find($value, $columns = array('*'))
-	{
-		$instance = new static;
-		if($instance->useCache)
-		{
-			$cache_key = $instance->getCacheKey($value);
-			if (Cache::has($cache_key))
-				return Cache::get($cache_key);
-		}
-		if (is_array($columns))
-			return $instance->newQuery()->find($value, $columns );
-		if(is_string($columns))
-			return $instance->newQuery()->where($columns, '=', $value)->first();
-		return null;
 	}
 
 	public static function findFirst($col, $val){
