@@ -11,31 +11,32 @@ class Collection implements ArrayAccess, Iterator, Countable, Serializable
 		return new static($collection, $class);
 	}
 
-	public function newInstance($item){
-		if($item instanceOf $this->class)
-			return $item;
-		$class = $this->class;
-		return new $class($item);
-	}
 	public function __construct($collection, $class =null)
 	{
 		if($class){
 			$this->class = $class;
 			foreach ($collection as $k => $item)
-				$this->container[$k] = $this->newInstance( $item);
+				$this->add($k,  $item);
 		}
 		else
 			$this->container = $collection;
 	}
 	public function add($item, $index = null)
 	{
-		if($this->class)
-			$item = $this->newInstance($item);
-		$this->container[$index] = $item;
+		if(!is_null($this->class))
+		{
+			$class = $this->class;
+			$item = new $class($item);
+		}
+		$this->offsetSet($index, $item);
 	}
 	public function first()
 	{
 		return count($this->container) > 0 ? reset($this->container) : null;
+	}
+	public function arrayWrap()
+	{
+		return (array)$this->container;
 	}
 	public function toArray()
 	{
