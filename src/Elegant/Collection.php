@@ -21,7 +21,8 @@ class Collection implements ArrayAccess, Iterator, Countable, Serializable
 	{
 		if($class){
 			$this->class = $class;
-			$this->container = array_map(array($this, 'newInstance'), $collection);
+			foreach ($collection as $k => $item)
+				$this->container[$k] = $this->newInstance( $item);
 		}
 		else
 			$this->container = $collection;
