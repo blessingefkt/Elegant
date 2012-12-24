@@ -14,7 +14,7 @@ class Elegant extends Model {
 	public $entity;
 	public $useCache = true;
 	public $ttl = 20; // Time To Live - for cache
-	protected $url = array();
+	// protected $url = array();
 
 	public function __construct($attributes = array())
 	{
@@ -34,23 +34,23 @@ class Elegant extends Model {
 	private function autoSetCreator(){
 		$this->setAttribute($this->autoSetCreator, Auth::user()->id);
 	}
-	public function url($type) {
-		if($this->exists){
-			$this->_init_urls();
-			return $this->url[$type];
-		}
-		return null;
-	}
+	// public function url($type) {
+	// 	if($this->exists){
+	// 		$this->_init_urls();
+	// 		return $this->url[$type];
+	// 	}
+	// 	return null;
+	// }
 
-	public function _init_urls() {
-		$base = $this->urlbase;
-		if($base){
-			$id = $this->key;
-			$this->url['edit'] = action("{$base}@edit", [$id]);
-			$this->url['view'] = action("{$base}@view", [$id]);
-			$this->url['delete'] = action("{$base}@view", [$id]);
-		}
-	}
+	// public function _init_urls() {
+	// 	$base = $this->urlbase;
+	// 	if($base){
+	// 		$id = $this->key;
+	// 		$this->url['edit'] = action("{$base}@edit", [$id]);
+	// 		$this->url['view'] = action("{$base}@view", [$id]);
+	// 		$this->url['delete'] = action("{$base}@view", [$id]);
+	// 	}
+	// }
 	/* Save ****************************/
 	public function preCreate() {}
 	public function postCreate() {}
