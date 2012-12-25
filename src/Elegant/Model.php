@@ -188,7 +188,7 @@ public function deleted($val =1){
 
 	public function present(){
 		if(is_string($this->present)){
-			$name = '\\'.$this->present;
+			$name = $this->present;
 			$this->present = new $name($this);
 		}
 		else
