@@ -18,10 +18,10 @@ class Elegant extends Model {
 
 	public function __construct($attributes = array())
 	{
-		 parent::__construct($attributes);
+		parent::__construct($attributes);
 		  // initialize empty messages object
-		 $this->errors = new \Illuminate\Support\MessageBag();
-		 $this->modelName = get_class($this);
+		$this->errors = new \Illuminate\Support\MessageBag();
+		$this->modelName = get_class($this);
 
 	}
 	/* Creator ****************************/
@@ -34,23 +34,7 @@ class Elegant extends Model {
 	private function autoSetCreator(){
 		$this->setAttribute($this->autoSetCreator, Auth::user()->id);
 	}
-	// public function url($type) {
-	// 	if($this->exists){
-	// 		$this->_init_urls();
-	// 		return $this->url[$type];
-	// 	}
-	// 	return null;
-	// }
 
-	// public function _init_urls() {
-	// 	$base = $this->urlbase;
-	// 	if($base){
-	// 		$id = $this->key;
-	// 		$this->url['edit'] = action("{$base}@edit", [$id]);
-	// 		$this->url['view'] = action("{$base}@view", [$id]);
-	// 		$this->url['delete'] = action("{$base}@view", [$id]);
-	// 	}
-	// }
 	/* Save ****************************/
 	public function preCreate() {}
 	public function postCreate() {}
@@ -72,17 +56,17 @@ class Elegant extends Model {
 		$before = is_null($preSave) ? $this->preSave() : $preSave($this);
 		  // check before & valid, then pass to parent
 		$success = ($before) ? parent::save() : false;
-		if ($success)
+		if ($success){
 			is_null($postSave) ? $this->postSave() : $postSave($this);
-		if($newRecord)
-			$this->postCreate();
+			if($newRecord)
+				$this->postCreate();
+		}
 		return $success;
 	}
 	public function onForceSave(){}
 	public function forceSave($validate=true, $rules=array(), $messages=array(), $onForceSave=null)
 	{
-		if ($validate)
-			$this->valid($rules, $messages);
+		if ($validate) $this->valid($rules, $messages);
 		 $before = is_null($onForceSave) ? $this->onForceSave() : $onForceSave($this);  // execute onForceSave
 		 return $before ? parent::save() : false; // save regardless of the result of validation
 	}
@@ -105,8 +89,8 @@ class Elegant extends Model {
 			{
 				is_null($postSoftDelete) ? $this->postSoftDelete() : $postSoftDelete($this);
 				if($success and $this->useCache)
-						Cache::forget($this->getCacheKey($this->id));
-			 }
+					Cache::forget($this->getCacheKey($this->id));
+			}
 			return $success;
 		}
 	}
@@ -122,10 +106,10 @@ class Elegant extends Model {
 			$success = ($before) ? parent::delete() : false;
 			if ($success)
 			{
-			 	is_null($postDelete) ? $this->postDelete() : $postDelete($this);
-			 	if($success and $this->useCache)
+				is_null($postDelete) ? $this->postDelete() : $postDelete($this);
+				if($success and $this->useCache)
 					Cache::forget($this->getCacheKey($this->id));
-			 }
+			}
 			return $success;
 		}
 	}
@@ -133,30 +117,30 @@ class Elegant extends Model {
 	/* Validate ****************************/
 	public function valid( $rules=array(), $messages=array())
 	{
-		 $valid = true;// innocent until proven guilty
-		 if(!empty($rules) || !empty($this->rules))
-		 {
-			$rules = (empty($rules)) ? $this->rules : $rules;// check for overrides
-			if (!empty($this->ruleSubs))
-				$rules = $this->ruleSubs +  $rules;
-			$messages = (empty($messages)) ? $this->messages : $messages;
-			if ($this->exists) // if the model exists, this is an update
-			{
-				$data = $this->get_dirty();
-				$rules = array_intersect_key($rules, $data); // so just validate the fields that are being updated
-			}
-			else // otherwise validate everything!
-			 	$data = $this->attributes;
-
-			$validator = Validator::make($data, $rules, $messages);// construct the validator
-			$valid = $validator->valid();
-
-			if($valid) // if the model is valid, unset old errors
-				$this->errors->messages = array();
-			else // otherwise set the new ones
-				$this->errors = $validator->errors;
+	 $valid = true;// innocent until proven guilty
+	 if(!empty($rules) || !empty($this->rules))
+	 {
+		$rules = (empty($rules)) ? $this->rules : $rules;// check for overrides
+		if (!empty($this->ruleSubs))
+			$rules = $this->ruleSubs +  $rules;
+		$messages = (empty($messages)) ? $this->messages : $messages;
+		if ($this->exists) // if the model exists, this is an update
+		{
+			$data = $this->get_dirty();
+			$rules = array_intersect_key($rules, $data); // so just validate the fields that are being updated
 		}
-		return $valid;
+		else // otherwise validate everything!
+		$data = $this->attributes;
+
+		$validator = Validator::make($data, $rules, $messages);// construct the validator
+		$valid = $validator->valid();
+
+		if($valid) // if the model is valid, unset old errors
+		$this->errors->messages = array();
+		else // otherwise set the new ones
+		$this->errors = $validator->errors;
+	}
+	return $valid;
 	}
 
 	private function getCacheKey($id)
@@ -212,31 +196,31 @@ class Elegant extends Model {
 		if($this->entity())
 			if($this->entity()->has($key))
 				return $this->entity()->$key;
-		return parent::__get($key);
-	}
+			return parent::__get($key);
+		}
 
-	/* STATIC FUNCTIONS ****************************/
-	public static function dne($id)
-	{
-		if (static::find($id))
-			return false;
-		return true;
-	}
-	public static function all($excSoftDeletes= true){
-		$instance = new static;
-		if(!is_null($instance->softDelete) and $excSoftDeletes)
-			return static::discarded(0)->get();
-		return parent::all();
-	}
+		/* STATIC FUNCTIONS ****************************/
+		public static function dne($id)
+		{
+			if (static::find($id))
+				return false;
+			return true;
+		}
+		public static function all($excSoftDeletes= true){
+			$instance = new static;
+			if(!is_null($instance->softDelete) and $excSoftDeletes)
+				return static::discarded(0)->get();
+			return parent::all();
+		}
 
-	public static function discarded($val =1){
-		$instance  = new static;
-		return $instance->deleted($val);
-	}
+		public static function discarded($val =1){
+			$instance  = new static;
+			return $instance->deleted($val);
+		}
 
-	public static function findFirst($col, $val){
-		$instance = new static;
-		return $instance->newQuery()->where($col, '=',$val)->first();
-	}
+		public static function findFirst($col, $val){
+			$instance = new static;
+			return $instance->newQuery()->where($col, '=',$val)->first();
+		}
 
-}
+	}
