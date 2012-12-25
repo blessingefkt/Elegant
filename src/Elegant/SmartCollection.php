@@ -13,8 +13,6 @@ class SmartCollection extends Collection
 	}
 
 	public function __set($key, $value){
-		if(!is_null($this->class))
-			$value = $this->newInstance($value);
 		return $this->offsetSet($key, $value);
 	}
 
