@@ -1,13 +1,13 @@
 <?php namespace Elegant;
-abstract class Entity {
-	public  $model = null;
-	public static $modelName = 'resource';
-	public $excluded =  array('toArray', 'genAttributes', 'toJson', '__get', 'has', '__construct');
+abstract class Present {
+	protected  $model = null;
+	protected $modelName = 'resource';
+	private $excluded =  array('toArray', 'genAttributes', 'toJson', '__get', 'has', '__construct');
 
 	public function __construct($model)
 	{
 		$this->model  = $model;
-		$this->{static::$modelName} = $this->model;
+		$this->{$this->$modelName} = $this->model;
 	}
 
 	public function has($key){

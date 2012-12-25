@@ -11,7 +11,7 @@ class Model extends IModel {
 	public $errors;
 	public $modelName = null;
 	public $urlbase = null;
-	public $entity = null;
+	public $present = null;
 	public $useCache = true;
 	public $ttl = 20; // Time To Live - for cache
 	// protected $url = array();
@@ -172,8 +172,8 @@ public function deleted($val =1){
 	public function toArray()
 	{
 		$attributes = parent::toArray();
-		if(!is_null($this->entity()))
-			$attributes = array_merge($attributes, $this->entity()->toArray());
+		if(!is_null($this->present()))
+			$attributes = array_merge($attributes, $this->present()->toArray());
 		return $attributes;
 	}
 	/**
@@ -186,22 +186,22 @@ public function deleted($val =1){
 		return array_pop($collection);
 	}
 
-	public function entity(){
-		if(is_string($this->entity)){
-			$name = '\\'.$this->entity;
-			$this->entity = new $name($this);
+	public function present(){
+		if(is_string($this->present)){
+			$name = '\\'.$this->present;
+			$this->present = new $name($this);
 		}
 		else
-			$this->entity = null;
-		return $this->entity;
+			$this->present = null;
+		return $this->present;
 	}
 
 	public function __get($key)
 	{
-		if($this->entity())
+		if($this->present())
 		{
-			if($this->entity()->has($key))
-				return $this->entity()->$key;
+			if($this->present()->has($key))
+				return $this->present()->$key;
 		}
 		return parent::__get($key);
 	}
