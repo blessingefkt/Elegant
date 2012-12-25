@@ -22,7 +22,7 @@ class Collection implements ArrayAccess, Iterator, Countable, Serializable
 	}
 	public function addObject($collection, $keyName = null)
 	{
-		if(!is_null($keyName))
+		if(is_null($keyName))
 			$keyName = $this->keyName;
 		if($collection instanceOf \Illuminate\Database\Eloquent\Collection)
 			$collection = $collection->all();
