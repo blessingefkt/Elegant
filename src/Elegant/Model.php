@@ -3,14 +3,14 @@ use Illuminate\Database\Eloquent\Model as IModel;
 use Cache;
 class Model extends IModel {
 	public $timestamps = false;
+	protected $includes;
 	public $autoSetCreator = null;
-	public $softDelete;
+	protected $softDelete;
 	public $rules = array();
 	private $ruleSubs = array();
-	public $messages = array();
-	public $errors;
+	protected $messages = array();
+	protected $errors;
 	public $modelName = null;
-	public $urlbase = null;
 	public $present = null;
 	public $useCache = true;
 	public $ttl = 20; // Time To Live - for cache
@@ -23,6 +23,12 @@ class Model extends IModel {
 		$this->errors = new \Illuminate\Support\MessageBag();
 		$this->modelName = get_class($this);
 
+	}
+	public  function newQuery(){
+		$query = parent::newQuery();
+		if($this->includes)
+			return $query->with($this->includes);
+		return $query;
 	}
 	/* Creator ****************************/
 	public function creator()
