@@ -1,8 +1,8 @@
 <?php namespace Elegant;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as IModel;
 use Cache;
-class Elegant extends Model {
-	public $timestamps = true;
+class Model extends IModel {
+	public $timestamps = false;
 	public $autoSetCreator = null;
 	public $softDelete;
 	public $rules = array();
