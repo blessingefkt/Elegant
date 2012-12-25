@@ -2,13 +2,10 @@
 use ArrayAccess, Iterator, Countable, Serializable;
 class SmartCollection extends Collection
 {
-	protected $_position = 0;
-	public $class;
-	protected $container = array();
 
-	public static function make($collection, $class = null)
+	public static function make($collection, $class = null, $keyName = null)
 	{
-		return new static($collection, $class);
+		return new static($collection, $class, $keyName);
 	}
 
 	public function __get($key){

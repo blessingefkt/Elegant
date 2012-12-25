@@ -4,22 +4,33 @@ class Collection implements ArrayAccess, Iterator, Countable, Serializable
 {
 	protected $_position = 0;
 	public $class;
+	public $keyName;
 	protected $container = array();
 
-	public static function make($collection, $class = null)
+	public static function make($collection, $class = null, $keyName = null)
 	{
-		return new static($collection, $class);
+		return new static($collection, $class, $keyName);
 	}
 
-	public function __construct($collection, $class =null)
+	public function __construct($collection, $class =null, $keyName = null)
 	{
-		if($class){
+		if($keyName)
+			$this->keyName = $keyName;
+		if($class)
 			$this->class = $class;
-			foreach ($collection as $k => $item)
-				$this->add($item, $k);
-		}
-		else
-			$this->container = $collection;
+		$this->addObject($collection, $keyName);
+	}
+	public function addObject($collection, $keyName = null)
+	{
+		if(!is_null($keyName))
+			$keyName = $this->keyName;
+		if($collection instanceOf \Illuminate\Database\Eloquent\Collection)
+			$collection = $collection->all();
+		$collection = array_walk($collection, function($item, $k) use($keyName){
+			if($keyName)
+				$k = $item->$keyName;
+			$this->add($item, $k);
+		});
 	}
 	public function add($item, $index = null)
 	{
