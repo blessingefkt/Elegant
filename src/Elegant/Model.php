@@ -64,59 +64,60 @@ class Model extends IModel {
 		return $success;
 	}
 	public function onForceSave(){}
-	public function forceSave($validate=true, $rules=array(), $messages=array(), $onForceSave=null)
+	public function forceSave($onForceSave=null, $validate=true, $rules=array(), $messages=array())
 	{
-		if ($validate) $this->valid($rules, $messages);
+		if ($validate)
+			$this->valid($rules, $messages);
 		 $before = is_null($onForceSave) ? $this->onForceSave() : $onForceSave($this);  // execute onForceSave
 		 return $before ? parent::save() : false; // save regardless of the result of validation
 	}
-	/* Soft Delete ****************************/
-	public function preSoftDelete() {  return true;  }
-	public function postSoftDelete()  { }
-	public function softDelete($val = true, $preSoftDelete=null, $postSoftDelete=null)
-	{
-		if ($this->exists)
+		/* Soft Delete ****************************/
+		public function preSoftDelete() {  return true;  }
+		public function postSoftDelete()  { }
+		public function softDelete($val = true, $preSoftDelete=null, $postSoftDelete=null)
 		{
-			$before = is_null($preSoftDelete) ? $this->preSoftDelete() : $preSoftDelete($this);
-			$success = null;
-			if($before) {
-				$this->setAttribute($this->softDelete, $val);
-				$success = $this->save(false);
-			}
-			else
-				$success = false;
-			if ($success)
+			if ($this->exists)
 			{
-				is_null($postSoftDelete) ? $this->postSoftDelete() : $postSoftDelete($this);
-				if($success and $this->useCache)
-					Cache::forget($this->getCacheKey($this->id));
+				$before = is_null($preSoftDelete) ? $this->preSoftDelete() : $preSoftDelete($this);
+				$success = null;
+				if($before) {
+					$this->setAttribute($this->softDelete, $val);
+					$success = $this->save(false);
+				}
+				else
+					$success = false;
+				if ($success)
+				{
+					is_null($postSoftDelete) ? $this->postSoftDelete() : $postSoftDelete($this);
+					if($success and $this->useCache)
+						Cache::forget($this->getCacheKey($this->id));
+				}
+				return $success;
 			}
-			return $success;
 		}
-	}
 
-	/* Hard Delete ****************************/
-	public function preDelete()  { return true;}
-	public function postDelete(){}
-	public function delete( $preDelete=null, $postDelete=null)
-	{
-		if ($this->exists)
+		/* Hard Delete ****************************/
+		public function preDelete()  { return true;}
+		public function postDelete(){}
+		public function delete( $preDelete=null, $postDelete=null)
 		{
-			$before = is_null($preDelete) ? $this->preDelete() : $preDelete($this);
-			$success = ($before) ? parent::delete() : false;
-			if ($success)
+			if ($this->exists)
 			{
-				is_null($postDelete) ? $this->postDelete() : $postDelete($this);
-				if($success and $this->useCache)
-					Cache::forget($this->getCacheKey($this->id));
+				$before = is_null($preDelete) ? $this->preDelete() : $preDelete($this);
+				$success = ($before) ? parent::delete() : false;
+				if ($success)
+				{
+					is_null($postDelete) ? $this->postDelete() : $postDelete($this);
+					if($success and $this->useCache)
+						Cache::forget($this->getCacheKey($this->id));
+				}
+				return $success;
 			}
-			return $success;
 		}
-	}
 
-	/* Validate ****************************/
-	public function valid( $rules=array(), $messages=array())
-	{
+		/* Validate ****************************/
+		public function valid( $rules=array(), $messages=array())
+		{
 	 $valid = true;// innocent until proven guilty
 	 if(!empty($rules) || !empty($this->rules))
 	 {
@@ -141,25 +142,29 @@ class Model extends IModel {
 		$this->errors = $validator->errors;
 	}
 	return $valid;
-	}
+}
+/* Caching ****************************/
+private function getCacheKey($id)
+{
+	return 'model_'.$this->table.'_'.$id;
+}
+/* Helpers ****************************/
+// public function increment($attr, $update){
+// 	$this->
+// }
+public function isDeleted(){
+	if(!is_null($this->softDelete))
+		return $this->{$this->softDelete};
+	else
+		throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
+}
+public function deleted($val =1){
+	if(!is_null($this->softDelete))
+		return $this->newQuery()->where($this->softDelete, '=',$val);
+	else
+		throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
+}
 
-	private function getCacheKey($id)
-	{
-		return 'model_'.$this->table.'_'.$id;
-	}
-
-	public function isDeleted(){
-		if(!is_null($this->softDelete))
-			return $this->{$this->softDelete};
-		else
-			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
-	}
-	public function deleted($val =1){
-		if(!is_null($this->softDelete))
-			return $this->newQuery()->where($this->softDelete, '=',$val);
-		else
-			throw new ElegantException("Column does not exist", "The softdelete column name has not been specified for the \"{$this->modelName}\" model.");
-	}
 	/**
 	 * Convert the model instance to an array.
 	 * @return array
@@ -194,33 +199,35 @@ class Model extends IModel {
 	public function __get($key)
 	{
 		if($this->entity())
+		{
 			if($this->entity()->has($key))
 				return $this->entity()->$key;
-			return parent::__get($key);
 		}
-
-		/* STATIC FUNCTIONS ****************************/
-		public static function dne($id)
-		{
-			if (static::find($id))
-				return false;
-			return true;
-		}
-		public static function all($excSoftDeletes= true){
-			$instance = new static;
-			if(!is_null($instance->softDelete) and $excSoftDeletes)
-				return static::discarded(0)->get();
-			return parent::all();
-		}
-
-		public static function discarded($val =1){
-			$instance  = new static;
-			return $instance->deleted($val);
-		}
-
-		public static function findFirst($col, $val){
-			$instance = new static;
-			return $instance->newQuery()->where($col, '=',$val)->first();
-		}
-
+		return parent::__get($key);
 	}
+
+	/* STATIC FUNCTIONS ****************************/
+	public static function dne($id)
+	{
+		if (static::find($id))
+			return false;
+		return true;
+	}
+	public static function all($excSoftDeletes= true){
+		$instance = new static;
+		if(!is_null($instance->softDelete) and $excSoftDeletes)
+			return static::discarded(0)->get();
+		return parent::all();
+	}
+
+	public static function discarded($val =1){
+		$instance  = new static;
+		return $instance->deleted($val);
+	}
+
+	public static function findFirst($col, $val){
+		$instance = new static;
+		return $instance->newQuery()->where($col, '=',$val)->first();
+	}
+
+}
