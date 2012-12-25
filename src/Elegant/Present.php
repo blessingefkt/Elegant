@@ -11,7 +11,7 @@ abstract class Present {
 	}
 
 	public function has($key){
-		return (method_exists($this, $key) );
+		return method_exists($this, $key) ;
 	}
 	public function __get($key)
 	{
@@ -24,7 +24,7 @@ abstract class Present {
 	public function toArray() {
 		return $this->genAttributes();
 	}
-	public function genAttributes()
+	protected function genAttributes()
 	{
 		$output = array();
 		$methods = array_diff(get_class_methods($this), $this->excluded);
