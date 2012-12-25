@@ -7,7 +7,7 @@ abstract class Present {
 	public function __construct($model)
 	{
 		$this->model  = $model;
-		$this->{$this->$modelName} = $this->model;
+		$this->{$this->modelName} = $this->model;
 	}
 
 	public function has($key){
