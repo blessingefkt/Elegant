@@ -31,11 +31,6 @@ class Model extends IModel {
 		return $query;
 	}
 	/* Creator ****************************/
-	public function creator()
-	{
-		if($foreignId = $this->autoSetCreator)
-			return $this->belongsTo('User', $foreignId);
-	}
 
 	private function autoSetCreator(){
 		$this->setAttribute($this->autoSetCreator, Auth::user()->id);
@@ -47,8 +42,7 @@ class Model extends IModel {
 	public function preSave() { return true; }
 	public function postSave()
 	{
-		if($this->useCache)
-			Cache::forget($this->getCacheKey($this->id));
+		$this->cacheDelete();
 	}
 	public function save($validate=true, $preSave=null, $postSave=null)
 	{
@@ -76,7 +70,7 @@ class Model extends IModel {
 			$this->valid($rules, $messages);
 		 $before = is_null($onForceSave) ? $this->onForceSave() : $onForceSave($this);  // execute onForceSave
 		 return $before ? parent::save() : false; // save regardless of the result of validation
-	}
+		}
 		/* Soft Delete ****************************/
 		public function preSoftDelete() {  return true;  }
 		public function postSoftDelete()  { }
@@ -95,8 +89,7 @@ class Model extends IModel {
 				if ($success)
 				{
 					is_null($postSoftDelete) ? $this->postSoftDelete() : $postSoftDelete($this);
-					if($success and $this->useCache)
-						Cache::forget($this->getCacheKey($this->id));
+					$this->cacheDelete();
 				}
 				return $success;
 			}
@@ -114,8 +107,7 @@ class Model extends IModel {
 				if ($success)
 				{
 					is_null($postDelete) ? $this->postDelete() : $postDelete($this);
-					if($success and $this->useCache)
-						Cache::forget($this->getCacheKey($this->id));
+					$this->cacheDelete();
 				}
 				return $success;
 			}
@@ -153,6 +145,10 @@ class Model extends IModel {
 private function getCacheKey($id)
 {
 	return 'model_'.$this->table.'_'.$id;
+}
+private function cacheDelete(){
+	if($this->useCache and Cache::has($this->getCacheKey($this->id)))
+			Cache::forget($this->getCacheKey($this->id));
 }
 /* Helpers ****************************/
 // public function increment($attr, $update){
@@ -193,12 +189,10 @@ public function deleted($val =1){
 	}
 
 	public function present(){
-		if(!is_null($this->present)){
+		if(!is_object($this->present) and is_string($this->present)){
 			$name = $this->present;
 			$this->present = new $name($this);
 		}
-		else
-			$this->present = null;
 		return $this->present;
 	}
 
@@ -219,12 +213,12 @@ public function deleted($val =1){
 			return false;
 		return true;
 	}
-	public static function all($excSoftDeletes= true){
-		$instance = new static;
-		if(!is_null($instance->softDelete) and $excSoftDeletes)
-			return static::discarded(0)->get();
-		return parent::all();
-	}
+	// public static function all($excSoftDeletes= true){
+	// 	$instance = new static;
+	// 	if(!is_null($instance->softDelete) and $excSoftDeletes)
+	// 		return static::discarded(0)->get();
+	// 	return parent::all();
+	// }
 
 	public static function discarded($val =1){
 		$instance  = new static;
