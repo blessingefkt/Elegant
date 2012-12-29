@@ -158,7 +158,7 @@ class Model extends IModel {
 				Cache::remember( $cacheKey , $value, $mins);
 		}
 	}
-	protected function cacheGet($key == null, $value == null){
+	protected function cacheGet($key = null, $value =null){
 		return Cache::get($this->getCacheKey($this->id, $key), $value);
 	}
 	protected function cacheDelete(){
