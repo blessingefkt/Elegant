@@ -155,7 +155,7 @@ class Model extends IModel {
 			if($mins === true)
 				Cache::forever($cacheKey, $value);
 			else
-				Cache::put( $cacheKey , $value, $mins);
+				Cache::remember( $cacheKey , $value, $mins);
 		}
 	}
 	protected function cacheGet($key == null, $value == null){
