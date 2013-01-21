@@ -12,9 +12,6 @@
         "illuminate/database": "dev-master"
     },
     "autoload": {
-        "classmap": [
-            "src/migrations"
-        ],
         "psr-0": {
             "Iyoworks\\Elegant": "src/"
         }
