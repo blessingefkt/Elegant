@@ -1,27 +1,22 @@
 {
     "name": "iyoworks/elegant",
-    "description": "An Extension of illuminate's Eloquent Model. Made for Laravel 4",
-    "keywords": ["eloquent", "model", "orm", "database", "laravel", "elegant"],
-    "license": "BSD",
+    "description": "",
     "authors": [
         {
             "name": "Blessing Osakue",
-            "email": "support@iyoworks.com",
-            "homepage": "http://iyoworks.com"
+            "email": "blessing@iyoworks.com"
         }
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/config": "1.*",
-        "illuminate/database": "1.*",
-        "illuminate/support": "1.*"
-    },
-    "require-dev": {
-        "mockery/mockery": "0.7.*"
+        "illuminate/support": "1.2.*"
     },
     "autoload": {
+        "classmap": [
+            "src/migrations"
+        ],
         "psr-0": {
-            "Elegant": "src/"
+            "Iyoworks\\Elegant": "src/"
         }
     },
     "minimum-stability": "dev"
