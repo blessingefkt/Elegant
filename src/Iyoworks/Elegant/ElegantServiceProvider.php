@@ -1,4 +1,4 @@
-<?php namespace Iyoworks\Elegant;
+<?php namespace Elegant;
 
 use Illuminate\Support\ServiceProvider;
 
